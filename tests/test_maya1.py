@@ -3,6 +3,8 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from snac import SNAC
 import soundfile as sf
 import numpy as np
+import sounddevice as sd
+import io
 
 CODE_START_TOKEN_ID = 128257
 CODE_END_TOKEN_ID = 128258
@@ -88,7 +90,7 @@ def main():
     print("\n[1/3] Loading Maya1 model...")
     model = AutoModelForCausalLM.from_pretrained(
         "maya-research/maya1", 
-        torch_dtype=torch.bfloat16, 
+        dtype=torch.bfloat16, 
         device_map="auto",
         trust_remote_code=True
     )
@@ -130,7 +132,7 @@ def main():
     with torch.inference_mode():
         outputs = model.generate(
             **inputs, 
-            max_new_tokens=2048,  # Increase to let model finish naturally
+            max_new_tokens=4096,  # Increase to let model finish naturally
             min_new_tokens=28,  # At least 4 SNAC frames
             temperature=0.4, 
             top_p=0.9, 
@@ -146,35 +148,35 @@ def main():
     print(f"Generated {len(generated_ids)} tokens")
     
     # Debug: Check what tokens we got
-    print(f"   First 20 tokens: {generated_ids[:20]}")
-    print(f"   Last 20 tokens: {generated_ids[-20:]}")
+    # print(f"   First 20 tokens: {generated_ids[:20]}")
+    # print(f"   Last 20 tokens: {generated_ids[-20:]}")
     
     # Check if EOS was generated
-    if CODE_END_TOKEN_ID in generated_ids:
-        eos_position = generated_ids.index(CODE_END_TOKEN_ID)
-        print(f" EOS token found at position {eos_position}/{len(generated_ids)}")
+    # if CODE_END_TOKEN_ID in generated_ids:
+    #     eos_position = generated_ids.index(CODE_END_TOKEN_ID)
+    #     print(f" EOS token found at position {eos_position}/{len(generated_ids)}")
     
     # Extract SNAC audio tokens
     snac_tokens = extract_snac_codes(generated_ids)
     
-    print(f"Extracted {len(snac_tokens)} SNAC tokens")
+    # print(f"Extracted {len(snac_tokens)} SNAC tokens")
     
     # Debug: Analyze token types
-    snac_count = sum(1 for t in generated_ids if SNAC_MIN_ID <= t <= SNAC_MAX_ID)
-    other_count = sum(1 for t in generated_ids if t < SNAC_MIN_ID or t > SNAC_MAX_ID)
-    print(f"   SNAC tokens in output: {snac_count}")
-    print(f"   Other tokens in output: {other_count}")
+    # snac_count = sum(1 for t in generated_ids if SNAC_MIN_ID <= t <= SNAC_MAX_ID)
+    # other_count = sum(1 for t in generated_ids if t < SNAC_MIN_ID or t > SNAC_MAX_ID)
+    # print(f"   SNAC tokens in output: {snac_count}")
+    # print(f"   Other tokens in output: {other_count}")
     
     # Check for SOS token
-    if CODE_START_TOKEN_ID in generated_ids:
-        sos_pos = generated_ids.index(CODE_START_TOKEN_ID)
-        print(f"   SOS token at position: {sos_pos}")
-    else:
-        print(f"   No SOS token found in generated output!")
+    # if CODE_START_TOKEN_ID in generated_ids:
+    #     sos_pos = generated_ids.index(CODE_START_TOKEN_ID)
+    #     print(f"   SOS token at position: {sos_pos}")
+    # else:
+    #     print(f"   No SOS token found in generated output!")
     
-    if len(snac_tokens) < 7:
-        print("Error: Not enough SNAC tokens generated")
-        return
+    # if len(snac_tokens) < 7:
+    #     print("Error: Not enough SNAC tokens generated")
+    #     return
     
     # Unpack SNAC tokens to 3 hierarchical levels
     levels = unpack_snac_from_7(snac_tokens)
@@ -205,6 +207,8 @@ def main():
     duration_sec = len(audio) / 24000
     print(f"Audio generated: {len(audio)} samples ({duration_sec:.2f}s)")
     
+    sd.play(audio, 24000)		# Play this without a sample rate to sound like a chipmunk
+    sd.wait()
     # Save your emotional voice output
     output_file = "output.wav"
     sf.write(output_file, audio, 24000)
