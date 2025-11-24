@@ -86,7 +86,8 @@ def unpack_snac_from_7(snac_tokens: list) -> list:
 
 def main():
     
-    # Load the best open source voice AI model
+    import time
+
     print("\n[1/3] Loading Maya1 model...")
     model = AutoModelForCausalLM.from_pretrained(
         "maya-research/maya1", 
@@ -108,9 +109,10 @@ def main():
     print("SNAC decoder loaded")
     
     # Design your voice with natural language
-    description = "Realistic male voice in the 30s age with american accent. Normal pitch, warm timbre, conversational pacing."
-    text = "Hello! This is Maya1 <laugh_harder> the best open source voice AI model with emotions."
+    description = "Simple male voice. low and deep pitch, conversational pacing."
+    text = "I am not going to listen to you!"
     
+    start = time.time()
     print("\n[3/3] Generating speech...")
     print(f"Description: {description}")
     print(f"Text: {text}")
@@ -134,7 +136,7 @@ def main():
             **inputs, 
             max_new_tokens=4096,  # Increase to let model finish naturally
             min_new_tokens=28,  # At least 4 SNAC frames
-            temperature=0.4, 
+            temperature=0.1, 
             top_p=0.9, 
             repetition_penalty=1.1,  # Prevent loops
             do_sample=True,
@@ -188,7 +190,7 @@ def main():
     print(f"   L3: {len(levels[2])} codes")
     
     # Convert to tensors
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = "cpu"
     codes_tensor = [
         torch.tensor(level, dtype=torch.long, device=device).unsqueeze(0)
         for level in levels
@@ -200,21 +202,25 @@ def main():
         z_q = snac_model.quantizer.from_codes(codes_tensor)
         audio = snac_model.decoder(z_q)[0, 0].cpu().numpy()
     
-    # Trim warmup samples (first 2048 samples)
-    if len(audio) > 2048:
-        audio = audio[2048:]
+    # # Trim warmup samples (first 2048 samples)
+    # if len(audio) > 2048:
+    #     audio = audio[2048:]
     
     duration_sec = len(audio) / 24000
     print(f"Audio generated: {len(audio)} samples ({duration_sec:.2f}s)")
     
     sd.play(audio, 24000)		# Play this without a sample rate to sound like a chipmunk
     sd.wait()
+
+    final = time.time()
+    print(f"It took: {final-start} seconds for {inputs['input_ids'].shape[1]} tokens")
     # Save your emotional voice output
-    output_file = "output.wav"
-    sf.write(output_file, audio, 24000)
-    print(f"\nVoice generated successfully!")
+    # output_file = "output.wav"
+    # sf.write(output_file, audio, 24000)
+    # print(f"\nVoice generated successfully!")
 
 
 if __name__ == "__main__":
     main()
+
 
