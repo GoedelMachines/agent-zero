@@ -299,6 +299,7 @@ class DynamicMcpProxy:
         # Update settings in the MCP server instance if provided
         mcp_server.settings.message_path = message_path
         mcp_server.settings.sse_path = sse_path
+        mcp_server._auth_server_provider = None
 
         # Create new MCP apps with updated settings
         with self._lock:
@@ -307,7 +308,7 @@ class DynamicMcpProxy:
                 message_path=mcp_server.settings.message_path,
                 sse_path=mcp_server.settings.sse_path,
                 auth_server_provider=mcp_server._auth_server_provider,
-                auth_settings=mcp_server.settings.auth,
+                # auth_settings=mcp_server.settings.auth,
                 debug=mcp_server.settings.debug,
                 routes=mcp_server._additional_http_routes,
                 middleware=[Middleware(BaseHTTPMiddleware, dispatch=mcp_middleware)],

@@ -166,6 +166,7 @@ class Memory:
             embeddings_model, store, namespace=embeddings_model_id
         )
 
+
         # initial DB and docs variables
         db: MyFaiss | None = None
         docs: dict[str, Document] | None = None

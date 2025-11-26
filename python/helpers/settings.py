@@ -1517,7 +1517,7 @@ def get_default_settings() -> Settings:
         rfc_port_http=55080,
         rfc_port_ssh=55022,
         shell_interface="local" if runtime.is_dockerized() else "ssh",
-        stt_model_size="base",
+        stt_model_size="base",      # This is for whisper, we can optionally use "tiny" or something
         stt_language="en",
         stt_silence_threshold=0.3,
         stt_silence_duration=1000,

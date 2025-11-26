@@ -1,5 +1,5 @@
 from typing import Any
-from browser_use.llm import ChatGoogle
+# from browser_use.llm import ChatGoogle
 from python.helpers import dirty_json
 
 
@@ -158,5 +158,8 @@ def _patched_fix_gemini_schema(self, schema: dict[str, Any]) -> dict[str, Any]:
     return clean_schema(schema)
 
 def apply():
-    """Applies the monkey-patch to ChatGoogle."""
-    ChatGoogle._fix_gemini_schema = _patched_fix_gemini_schema
+    pass
+
+# def apply():
+#     """Applies the monkey-patch to ChatGoogle."""
+#     ChatGoogle._fix_gemini_schema = _patched_fix_gemini_schema
