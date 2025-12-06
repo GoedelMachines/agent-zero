@@ -1,7 +1,7 @@
 import asyncio
 from python.helpers import runtime, whisper, settings
 from python.helpers.print_style import PrintStyle
-from python.helpers import kokoro_tts
+from python.helpers import maya1_tts, kokoro_tts
 import models
 
 
@@ -37,11 +37,19 @@ async def preload():
                 except Exception as e:
                     PrintStyle().error(f"Error in preload_kokoro: {e}")
 
+        # preload maya1_tts model if enabled
+        async def preload_maya1():
+            if set["tts_maya1"]:
+                try:
+                    return await maya1_tts.preload()
+                except Exception as e:
+                    PrintStyle().error(f"Error in preload_maya1: {e}")
         # async tasks to preload
         tasks = [
             preload_embedding(),
             # preload_whisper(),
-            # preload_kokoro()
+            # preload_kokoro(),
+            preload_maya1(),
         ]
 
         await asyncio.gather(*tasks, return_exceptions=True)
