@@ -4,6 +4,8 @@ from python.helpers.api import ApiHandler, Input, Output, Request, Response
 from python.helpers import projects, guids
 from agent import AgentContext
 
+# This is the function we need to edit then. 
+# Basically have an LLM that decides to call this or continue the same session based on all context
 
 class CreateChat(ApiHandler):
     async def process(self, input: Input, request: Request) -> Output:
