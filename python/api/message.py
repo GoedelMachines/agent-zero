@@ -9,8 +9,8 @@ from python.helpers.print_style import PrintStyle
 
 
 class Message(ApiHandler):
-    async def process(self, input: dict, request: Request) -> dict | Response:
-        task, context = await self.communicate(input=input, request=request)
+    async def process(self, request: Request) -> dict | Response:
+        task, context = await self.communicate(request=request)
         return await self.respond(task, context)
 
     async def respond(self, task: DeferredTask, context: AgentContext):
@@ -20,8 +20,10 @@ class Message(ApiHandler):
             "context": context.id,
         }
 
-    async def communicate(self, input: dict, request: Request):
+    async def communicate(self, request: Request):
         # Handle both JSON and multipart/form-data
+        # print(f"\nInside here and this is the message: {input}\n")
+        print(f"\nThis is the request: {request.get_json()}\n")
         if request.content_type.startswith("multipart/form-data"):
             text = request.form.get("text", "")
             ctxid = request.form.get("context", "")

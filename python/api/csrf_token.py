@@ -2,7 +2,6 @@ import secrets
 from urllib.parse import urlparse
 from python.helpers.api import (
     ApiHandler,
-    Input,
     Output,
     Request,
     Response,
@@ -22,7 +21,8 @@ class GetCsrfToken(ApiHandler):
     def requires_csrf(cls) -> bool:
         return False
 
-    async def process(self, input: Input, request: Request) -> Output:
+    async def process(self, request: Request) -> Output:
+        print("This is the first processing that happens.")
 
         # check for allowed origin to prevent dns rebinding attacks
         origin_check = await self.check_allowed_origin(request)

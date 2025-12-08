@@ -222,6 +222,8 @@ class AgentContext:
         return self.streaming_agent or self.agent0
 
     def communicate(self, msg: "UserMessage", broadcast_level: int = 1):
+        print(f"\nwhen is this called? {msg}\n")
+        print("This is called much later than expected")
         self.paused = False  # unpause if paused
 
         current_agent = self.get_agent()

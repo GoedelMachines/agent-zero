@@ -43,7 +43,9 @@ class ApiHandler:
     async def process(self, input: Input, request: Request) -> Output:
         pass
 
+    # So stuff comes here before .communicate of course
     async def handle_request(self, request: Request) -> Response:
+        print(f"*******This is the request inside handle_request: {request}******")
         try:
             # input data from request based on type
             input_data: Input = {}
@@ -62,7 +64,9 @@ class ApiHandler:
 
 
             # process via handler
-            output = await self.process(input_data, request)
+            print(f"************Another input data first probably: {input_data}**********")
+            # print(f"\nBut this is the same as the request!: {request.get_json()}\n")
+            output = await self.process(request)        # You don't have to pass the input_data in there, its not doing anything being passed around
 
             # return output based on type
             if isinstance(output, Response):
@@ -80,6 +84,7 @@ class ApiHandler:
             return Response(response=error, status=500, mimetype="text/plain")
 
     # get context to run agent zero in
+    # This is what differentiates between sessions, this will be an inmportant function later on
     def use_context(self, ctxid: str, create_if_not_exists: bool = True):
         with self.thread_lock:
             if not ctxid:
