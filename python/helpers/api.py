@@ -66,7 +66,7 @@ class ApiHandler:
             # process via handler
             print(f"************Another input data first probably: {input_data}**********")
             # print(f"\nBut this is the same as the request!: {request.get_json()}\n")
-            output = await self.process(request)        # You don't have to pass the input_data in there, its not doing anything being passed around
+            output = await self.process(input_data, request)        # You don't have to pass the input_data in there, its not doing anything being passed around
 
             # return output based on type
             if isinstance(output, Response):
